@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "mapicons",
+  "version": "${version}",
+  "name": "Map Icons Lib",
+  "description": "A minecraft library to add map icons for fabric mod loader.",
+  "authors": [
+    "rokoblox"
+  ],
+  "contact": {
+    "repo": "https://github.com/rokoblox/mapicons.git"
+  },
+  "license": "MIT",
+  "icon": "assets/mapicons/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "com.rokoblox.mapicons.client.MapIconsClient"
+    ],
+    "main": [
+      "com.rokoblox.mapicons.MapIcons"
+    ]
+  },
+  "mixins": [
+    "mapicons.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.8",
+    "fabric": "*",
+    "minecraft": "1.19"
+  }
+}
