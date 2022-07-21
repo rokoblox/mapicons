@@ -13,20 +13,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 /**
- * A custom marker.
+ * A custom map marker.
  * <p>
  * Keeps track of custom markers in a map state.
  */
 public class MapMarker {
     private final Identifier id;
-    private final BlockPos pos;
-    @Nullable
-    private final Text name;
+    private final Boolean dynamic;
 
-    public MapMarker(Identifier id, BlockPos pos, @Nullable Text name) {
+    public MapMarker(Identifier id, Boolean dynamic) {
         this.id = id;
-        this.pos = pos;
-        this.name = name;
+        this.dynamic = dynamic;
     }
 
     public static MapMarker fromNbt(NbtCompound nbt) {
