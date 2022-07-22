@@ -2,15 +2,16 @@
   "schemaVersion": 1,
   "id": "pinlib",
   "version": "${version}",
-  "name": "Map Icons Lib",
+  "name": "PinLib",
   "description": "A minecraft library to add map icons and markers for fabric mod loader.",
   "authors": [
     "rokoblox"
   ],
   "contact": {
-    "repo": "https://github.com/rokoblox/mapicons.git"
+    "repo": "https://github.com/rokoblox/pinlib.git"
   },
   "license": "MIT",
+  "icon": "assets/pinlib/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [

@@ -44,8 +44,9 @@ public class MapTextureMixin {
     @ModifyArg(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;", ordinal = 1))
     private RenderLayer pinlib$CustomRenderLayer(RenderLayer rl) {
         if (pinlib$custom_marker_cache != null) {
+            rl = pinlib$custom_marker_cache.getIconRenderLayer();
             pinlib$custom_marker_cache = null;
-            return pinlib$custom_marker_cache.getIconRenderLayer();
-        } else return rl;
+        }
+        return rl;
     }
 }

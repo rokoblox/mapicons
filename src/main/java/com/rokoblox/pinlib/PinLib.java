@@ -1,5 +1,6 @@
 package com.rokoblox.pinlib;
 
+import com.rokoblox.pinlib.access.MapStateAccessor;
 import com.rokoblox.pinlib.mapmarker.MapMarker;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
@@ -7,9 +8,9 @@ import net.minecraft.item.map.MapState;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
 
 public class PinLib implements ModInitializer {
 
@@ -22,6 +23,7 @@ public class PinLib implements ModInitializer {
      */
     @Override
     public void onInitialize() {
+        TestingClass.init(LOGGER); // Used for testing purposes only.
     }
 
     /**
@@ -68,7 +70,8 @@ public class PinLib implements ModInitializer {
      * @param pos Block Position to place marker
      * @return Provided MapState
      */
-    public static MapState addMapMarker(MapState mapState, MapMarker marker, BlockPos pos) {
+    public static MapState addMapMarker(MapState mapState, World world, MapMarker marker, BlockPos pos) {
+        ((MapStateAccessor) mapState).addMapMarker(world, pos);
         return mapState;
     }
 

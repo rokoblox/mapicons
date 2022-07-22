@@ -11,6 +11,5 @@ import java.util.Collection;
 public interface MapStateAccessor {
     boolean addMapMarker(WorldAccess world, BlockPos pos);
     @Nullable BlockPos removeMapMarker(BlockView world, int x, int z);
-
     Collection<MapMarkerEntity> getCustomMarkerEntities();
 }
