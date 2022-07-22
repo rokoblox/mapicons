@@ -1,6 +1,6 @@
 package com.rokoblox.pinlib.access;
 
-import com.rokoblox.pinlib.mapmarker.MapMarker;
+import com.rokoblox.pinlib.mapmarker.MapMarkerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
@@ -12,5 +12,5 @@ public interface MapStateAccessor {
     boolean addMapMarker(WorldAccess world, BlockPos pos);
     @Nullable BlockPos removeMapMarker(BlockView world, int x, int z);
 
-    Collection<MapMarker> getCustomMarkers();
+    Collection<MapMarkerEntity> getCustomMarkerEntities();
 }

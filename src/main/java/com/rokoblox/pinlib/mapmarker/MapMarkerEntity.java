@@ -127,4 +127,8 @@ public class MapMarkerEntity {
         return Objects.hash("pinLibMapMarkerEntity", this.type, this.id, this.pos, this.displayName, this.color);
     }
 
+    public String getKey() {
+        return this.id.toString() + "-" + this.pos.getX() + "," + this.pos.getY() + "," + this.pos.getZ();
+    }
+
 }

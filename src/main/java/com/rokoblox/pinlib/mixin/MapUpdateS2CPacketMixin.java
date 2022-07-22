@@ -1,5 +1,6 @@
 package com.rokoblox.pinlib.mixin;
 
+import com.rokoblox.pinlib.PinLib;
 import com.rokoblox.pinlib.access.MapIconAccessor;
 import net.minecraft.item.map.MapIcon;
 import net.minecraft.network.PacketByteBuf;
@@ -13,12 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(MapUpdateS2CPacket.class)
 public class MapUpdateS2CPacketMixin {
     @Inject(method = "method_43883", at = @At(value = "RETURN"))
-    private static void fwaystones$read_waystone_state(PacketByteBuf buf3, CallbackInfoReturnable<MapIcon> cir) {
-        ((MapIconAccessor)cir.getReturnValue()).setIsCustom(buf3.readBoolean());
+    private static void pinlib$ReadCustomMarkerStates(PacketByteBuf buf3, CallbackInfoReturnable<MapIcon> cir) {
+        ((MapIconAccessor)cir.getReturnValue()).setCustomMarker(PinLib.get(buf3.readIdentifier()));
     }
 
     @Inject(method = "method_34136", at = @At(value = "RETURN"))
-    private static void fwaystones$write_waystone_state(PacketByteBuf b, MapIcon icon, CallbackInfo ci) {
-        b.writeBoolean(((MapIconAccessor)icon).getIsCustom());
+    private static void pinlib$WriteCustomMarkerStates(PacketByteBuf b, MapIcon icon, CallbackInfo ci) {
+        b.writeIdentifier(((MapIconAccessor)icon).getCustomMarker().getId());
     }
 }

@@ -9,19 +9,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
 
 public class PinLib implements ModInitializer {
 
     public static final Logger LOGGER = LogManager.getLogger("PinLib");
-
-    private static final Registry<MapMarker> registry = FabricRegistryBuilder.createDefaulted(MapMarker.class, new Identifier("pinlib", "map_markers"), new Identifier("pinlib", "default")).buildAndRegister();
+    private static final Registry<MapMarker> REGISTRY = FabricRegistryBuilder.createDefaulted(MapMarker.class, new Identifier("pinlib", "map_markers"), new Identifier("pinlib", "default")).buildAndRegister();
+    private static final MapMarker DEFAULT_MARKER = createStaticMarker(new Identifier("pinlib", "default"));
 
     /**
      * This is invoked by fabric; do not call.
      */
     @Override
     public void onInitialize() {
-        createStaticMarker(new Identifier("pinlib", "default"));
     }
 
     /**
@@ -38,7 +38,7 @@ public class PinLib implements ModInitializer {
      * @return Static MapMarker
      */
     public static MapMarker createStaticMarker(Identifier id) {
-        return Registry.register(registry, id, new MapMarker(id, false));
+        return Registry.register(REGISTRY, id, new MapMarker(id, false));
     }
 
     /**
@@ -58,7 +58,7 @@ public class PinLib implements ModInitializer {
      * @return Static MapMarker
      */
     public static MapMarker createDynamicMarker(Identifier id) {
-        return Registry.register(registry, id, new MapMarker(id, true));
+        return Registry.register(REGISTRY, id, new MapMarker(id, true));
     }
 
     /**
@@ -84,6 +84,9 @@ public class PinLib implements ModInitializer {
     }
 
     public static MapMarker get(Identifier id) {
-        return registry.get(id);
+        return REGISTRY.get(id);
+    }
+    public static MapMarker getDefaultMarker() {
+        return DEFAULT_MARKER;
     }
 }

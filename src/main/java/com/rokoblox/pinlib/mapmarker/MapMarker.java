@@ -14,12 +14,13 @@ import java.util.Objects;
 public class MapMarker {
     private final Identifier id;
     private final boolean dynamic;
+
     private final RenderLayer iconRenderLayer;
 
     public MapMarker(Identifier id, Boolean dynamic) {
         this.id = id;
         this.dynamic = dynamic;
-        this.iconRenderLayer = RenderLayer.getText(new Identifier(id.getNamespace(), "textures/map/icons/" + id.getPath() + ".png"));;
+        this.iconRenderLayer = RenderLayer.getText(new Identifier(id.getNamespace(), "textures/map/icons/" + id.getPath() + ".png"));
     }
 
     public boolean equals(Object o) {
@@ -43,5 +44,9 @@ public class MapMarker {
 
     public boolean isDynamic() {
         return this.dynamic;
+    }
+
+    public RenderLayer getIconRenderLayer() {
+        return iconRenderLayer;
     }
 }

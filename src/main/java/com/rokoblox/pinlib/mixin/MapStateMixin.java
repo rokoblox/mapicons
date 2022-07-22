@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.rokoblox.pinlib.access.MapIconAccessor;
 import com.rokoblox.pinlib.access.MapStateAccessor;
 import com.rokoblox.pinlib.mapmarker.MapMarker;
+import com.rokoblox.pinlib.mapmarker.MapMarkerEntity;
 import net.minecraft.item.map.MapIcon;
 import net.minecraft.item.map.MapState;
 import net.minecraft.nbt.NbtCompound;
@@ -36,27 +37,28 @@ public class MapStateMixin implements MapStateAccessor {
     private void addIcon(MapIcon.Type type, @Nullable WorldAccess world, String key, double x, double z, double rotation, @Nullable Text text) {}
 
     @Unique
-    private final Map<String, MapMarker> pinlib$customMarkers = Maps.newHashMap();
+    private final Map<String, MapMarkerEntity> pinlib$customMarkerEntities = Maps.newHashMap();
 
     @Unique
-    private boolean pinlib$isAddingCustomMapIcon;
+    @Nullable
+    private MapMarker pinlib$customIconMarkerToAdd;
 
     @Inject(method = "fromNbt", at = @At("TAIL"))
     private static void pinlib$loadCustomMarkersNBT(NbtCompound nbt, CallbackInfoReturnable<MapState> cir) {
         MapState mapState = cir.getReturnValue();
         NbtList nbtList = nbt.getList("pinlib_custom_markers", NbtElement.COMPOUND_TYPE);
         for (int k = 0; k < nbtList.size(); ++k) {
-            MapMarker mapMarker = MapMarker.fromNbt(nbtList.getCompound(k));
-            ((MapStateMixin)(Object)mapState).pinlib$customMarkers.put(mapMarker.getKey(), mapMarker);
-            ((MapStateMixin)(Object)mapState).pinlib$isAddingCustomMapIcon = true;
-            ((MapStateMixin)(Object)mapState).addIcon(mapMarker.getIconType(), null, mapMarker.getKey(), mapMarker.getPos().getX(), mapMarker.getPos().getZ(), 180.0, mapMarker.getName());
+            MapMarkerEntity mapMarker = MapMarkerEntity.fromNbt(nbtList.getCompound(k));
+            ((MapStateMixin)(Object)mapState).pinlib$customMarkerEntities.put(mapMarker.getKey(), mapMarker);
+            ((MapStateMixin)(Object)mapState).pinlib$customIconMarkerToAdd = mapMarker.getType();
+            ((MapStateMixin)(Object)mapState).addIcon(MapIcon.Type.TARGET_POINT, null, mapMarker.getKey(), mapMarker.getPos().getX(), mapMarker.getPos().getZ(), 180.0, mapMarker.getDisplayName());
         }
     }
 
     @Inject(method = "writeNbt", at = @At("TAIL"))
     private void pinlib$saveCustomMarkersNBT(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
         NbtList nbtList = new NbtList();
-        for (MapMarker mapMarker : this.pinlib$customMarkers.values()) {
+        for (MapMarkerEntity mapMarker : this.pinlib$customMarkerEntities.values()) {
             nbtList.add(mapMarker.getNbt());
         }
         nbt.put("pinlib_custom_markers", nbtList);
@@ -64,14 +66,14 @@ public class MapStateMixin implements MapStateAccessor {
 
     @Inject(method = "copy", at = @At(value = "INVOKE", target = "Ljava/util/Map;putAll(Ljava/util/Map;)V", ordinal = 1))
     private void copyWaystones(CallbackInfoReturnable<MapState> cir) {
-        ((MapStateMixin)(Object)cir.getReturnValue()).pinlib$customMarkers.putAll(this.pinlib$customMarkers);
+        ((MapStateMixin)(Object)cir.getReturnValue()).pinlib$customMarkerEntities.putAll(this.pinlib$customMarkerEntities);
     }
 
     @ModifyVariable(method = "addIcon", at = @At("STORE"))
     private MapIcon markIconAsCustomIcon(MapIcon icon) {
-        if (pinlib$isAddingCustomMapIcon)
-            ((MapIconAccessor)icon).setIsCustom(true);
-        pinlib$isAddingCustomMapIcon = false;
+        if (pinlib$customIconMarkerToAdd != null)
+            ((MapIconAccessor)icon).setCustomMarker(pinlib$customIconMarkerToAdd);
+        pinlib$customIconMarkerToAdd = null;
         return icon;
     }
 
@@ -82,18 +84,18 @@ public class MapStateMixin implements MapStateAccessor {
         double f = (d - (double)((MapState)(Object)this).centerX) / (double)i;
         double g = (e - (double)((MapState)(Object)this).centerZ) / (double)i;
         if (f >= -63.0 && g >= -63.0 && f <= 63.0 && g <= 63.0) {
-            MapMarker mapMarker = MapMarker.fromWorldBlock(world, pos);
+            MapMarkerEntity mapMarker = MapMarkerEntity.fromWorldBlock(world, pos);
             if (mapMarker == null) {
                 return false;
             }
-            if (this.pinlib$customMarkers.remove(mapMarker.getKey(), mapMarker)) {
+            if (this.pinlib$customMarkerEntities.remove(mapMarker.getKey(), mapMarker)) {
                 removeIcon(mapMarker.getKey());
                 return true;
             }
             if (!((MapState)(Object)this).method_37343(256)) {
-                this.pinlib$customMarkers.put(mapMarker.getKey(), mapMarker);
-                pinlib$isAddingCustomMapIcon = true;
-                addIcon(mapMarker.getIconType(), world, mapMarker.getKey(), d, e, 180.0, mapMarker.getName());
+                this.pinlib$customMarkerEntities.put(mapMarker.getKey(), mapMarker);
+                pinlib$customIconMarkerToAdd = mapMarker.getType();
+                addIcon(MapIcon.Type.TARGET_POINT, world, mapMarker.getKey(), d, e, 180.0, mapMarker.getDisplayName());
                 return true;
             }
         }
@@ -102,11 +104,11 @@ public class MapStateMixin implements MapStateAccessor {
 
     @SuppressWarnings({"TooBroadScope", "UnclearExpression"})
     public @Nullable BlockPos removeMapMarker(BlockView world, int x, int z) {
-        Iterator<MapMarker> iterator = this.pinlib$customMarkers.values().iterator();
+        Iterator<MapMarkerEntity> iterator = this.pinlib$customMarkerEntities.values().iterator();
         while (iterator.hasNext()) {
-            MapMarker mapMarker2;
-            MapMarker mapMarker = iterator.next();
-            if (mapMarker.getPos().getX() != x || mapMarker.getPos().getZ() != z || mapMarker.equals(mapMarker2 = MapMarker.fromWorldBlock(world, mapMarker.getPos()))) continue;
+            MapMarkerEntity mapMarker2;
+            MapMarkerEntity mapMarker = iterator.next();
+            if (mapMarker.getPos().getX() != x || mapMarker.getPos().getZ() != z || mapMarker.equals(mapMarker2 = MapMarkerEntity.fromWorldBlock(world, mapMarker.getPos()))) continue;
             iterator.remove();
             this.removeIcon(mapMarker.getKey());
             return mapMarker.getPos();
@@ -114,7 +116,7 @@ public class MapStateMixin implements MapStateAccessor {
         return null;
     }
 
-    public Collection<MapMarker> getCustomMarkers() {
-        return this.pinlib$customMarkers.values();
+    public Collection<MapMarkerEntity> getCustomMarkerEntities() {
+        return this.pinlib$customMarkerEntities.values();
     }
 }

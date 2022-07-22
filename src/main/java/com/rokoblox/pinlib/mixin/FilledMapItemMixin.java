@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 @Mixin(FilledMapItem.class)
 public class FilledMapItemMixin {
     @ModifyArgs(method = "updateColors", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/map/MapState;removeBanner(Lnet/minecraft/world/BlockView;II)V"))
-    private void pinlib$updateCustomMarkers(Args args, World world, Entity entity, MapState state) {
+    private void pinlib$UpdateCustomMarkers(Args args, World world, Entity entity, MapState state) {
         BlockPos removalPos;
         if ((removalPos = ((MapStateAccessor)state).removeMapMarker(world, args.get(1), args.get(2))) != null)
             ((MapStateAccessor)state).addMapMarker((WorldAccess) world, removalPos);
