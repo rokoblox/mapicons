@@ -21,6 +21,7 @@ public class PinLib implements ModInitializer {
      */
     @Override
     public void onInitialize() {
+        createStaticMarker(new Identifier("pinlib", "default"));
     }
 
     /**
@@ -80,5 +81,9 @@ public class PinLib implements ModInitializer {
      */
     public static MapState removeMapMarker(MapState mapState, MapMarker marker, BlockPos pos) {
         return mapState;
+    }
+
+    public static MapMarker get(Identifier id) {
+        return registry.get(id);
     }
 }

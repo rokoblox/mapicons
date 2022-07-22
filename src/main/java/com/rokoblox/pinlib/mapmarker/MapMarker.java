@@ -1,59 +1,25 @@
 package com.rokoblox.pinlib.mapmarker;
-import net.minecraft.block.entity.BlockEntity;
+
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.map.MapIcon;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 /**
- * A custom map marker.
+ * A custom map marker type.
  * <p>
- * Keeps track of custom markers in a map state.
+ * Used to create MapMarkerEntity.
  */
 public class MapMarker {
     private final Identifier id;
-    private final Boolean dynamic;
+    private final boolean dynamic;
+    private final RenderLayer iconRenderLayer;
 
     public MapMarker(Identifier id, Boolean dynamic) {
         this.id = id;
         this.dynamic = dynamic;
-    }
-
-    public static MapMarker fromNbt(NbtCompound nbt) {
-        Identifier id = new Identifier(nbt.getString("CustomID"));
-        BlockPos blockPos = NbtHelper.toBlockPos(nbt.getCompound("Pos"));
-        MutableText text = nbt.contains("Name") ? Text.Serializer.fromJson(nbt.getString("Name")) : null;
-        return new MapMarker(id, blockPos, text);
-    }
-
-    @Nullable
-    public static MapMarker fromWorldBlock(BlockView blockView, BlockPos blockPos) {
-        BlockEntity blockEntity = blockView.getBlockEntity(blockPos);
-        if (blockEntity instanceof MapMarkedBlockEntity mapMarkedBlockEntity) {
-            Text text = Text.literal(mapMarkedBlockEntity.getMapMarkerName());
-            return new MapMarker(mapMarkedBlockEntity.getCustomMapMarkerId(), blockPos, text);
-        }
-        return null;
-    }
-
-    public BlockPos getPos() {
-        return this.pos;
-    }
-
-    public MapIcon.Type getIconType() {
-        return MapIcon.Type.byId((byte) 27);
-    }
-
-    @Nullable
-    public Text getName() {
-        return this.name;
+        this.iconRenderLayer = RenderLayer.getText(new Identifier(id.getNamespace(), "textures/map/icons/" + id.getPath() + ".png"));;
     }
 
     public boolean equals(Object o) {
@@ -64,23 +30,18 @@ public class MapMarker {
             return false;
         }
         MapMarker mapMarker = (MapMarker)o;
-        return Objects.equals(this.pos, mapMarker.pos) && Objects.equals(this.name, mapMarker.name);
+        return Objects.equals(this.id, mapMarker.id) && Objects.equals(this.dynamic, mapMarker.dynamic);
     }
 
     public int hashCode() {
-        return Objects.hash(this.pos, this.name);
+        return Objects.hash("pinLibMapMarker", this.id, this.dynamic);
     }
 
-    public NbtCompound getNbt() {
-        NbtCompound nbtCompound = new NbtCompound();
-        nbtCompound.put("Pos", NbtHelper.fromBlockPos(this.pos));
-        if (this.name != null) {
-            nbtCompound.putString("Name", Text.Serializer.toJson(this.name));
-        }
-        return nbtCompound;
+    public Identifier getId() {
+        return this.id;
     }
 
-    public String getKey() {
-        return "-" + this.pos.getX() + "," + this.pos.getY() + "," + this.pos.getZ();
+    public boolean isDynamic() {
+        return this.dynamic;
     }
 }
