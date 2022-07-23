@@ -18,6 +18,6 @@ public class FilledMapItemMixin {
     private void pinlib$UpdateCustomMarkers(Args args, World world, Entity entity, MapState state) {
         BlockPos removalPos;
         if ((removalPos = ((MapStateAccessor)state).removeMapMarker(world, args.get(1), args.get(2))) != null)
-            ((MapStateAccessor)state).addMapMarker((WorldAccess) world, removalPos);
+            ((MapStateAccessor)state).addMapMarker((WorldAccess) world, removalPos, null);
     }
 }

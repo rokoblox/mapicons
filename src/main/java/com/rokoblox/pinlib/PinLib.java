@@ -2,15 +2,20 @@ package com.rokoblox.pinlib;
 
 import com.rokoblox.pinlib.access.MapStateAccessor;
 import com.rokoblox.pinlib.mapmarker.MapMarker;
+import com.rokoblox.pinlib.mapmarker.MapMarkerEntity;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.minecraft.item.FilledMapItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.map.MapState;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 public class PinLib implements ModInitializer {
 
@@ -64,15 +69,40 @@ public class PinLib implements ModInitializer {
     }
 
     /**
-     * @TODO: 22/07/2022
-     * @param mapState Modified MapState
-     * @param marker Added MapMarker
-     * @param pos Block Position to place marker
+     * Adds a map marker to the provided
+     * MapState (You could use the simpler
+     * tryAddMapMarker() instead).
+     *
+     * @param mapState   Modified MapState
+     * @param pos        Block Position to place marker
+     * @param markerType Map marker type
      * @return Provided MapState
      */
-    public static MapState addMapMarker(MapState mapState, World world, MapMarker marker, BlockPos pos) {
-        ((MapStateAccessor) mapState).addMapMarker(world, pos);
-        return mapState;
+    public static MapMarkerEntity addMapMarker(MapState mapState, @Nullable World world, BlockPos pos, @Nullable MapMarker markerType, @Nullable Text displayName) {
+        MapMarkerEntity mapMarker;
+        if (markerType == null)
+            mapMarker = MapMarkerEntity.fromWorldBlock(world, pos);
+        else
+            mapMarker = new MapMarkerEntity(markerType, pos, displayName);
+        return ((MapStateAccessor) mapState).addMapMarker(world, pos, mapMarker) ? mapMarker : null;
+    }
+
+    /**
+     * Tries to add a map marker to the
+     * provided ItemStack if it's a valid
+     * map and contains a valid MapState.
+     *
+     * @param stack      The item stack which the marker will be added to
+     * @param world      Not sure what this does, it's just something minecraft has in its code that apparently changes icon rotation based on lighting...?
+     * @param markerType Map marker type
+     * @return Provided MapState
+     */
+    public static MapMarkerEntity tryAddMapMarker(ItemStack stack, @Nullable World world, BlockPos pos, @Nullable MapMarker markerType, @Nullable Text displayName) {
+        MapState mapState = FilledMapItem.getOrCreateMapState(stack, world);
+        if (mapState != null) {
+            return addMapMarker(mapState, world, pos, markerType, displayName);
+        }
+        return null;
     }
 
     /**

@@ -77,14 +77,13 @@ public class MapStateMixin implements MapStateAccessor {
         return icon;
     }
 
-    public boolean addMapMarker(WorldAccess world, BlockPos pos) {
+    public boolean addMapMarker(WorldAccess world, BlockPos pos, MapMarkerEntity mapMarker) {
         double d = (double)pos.getX() + 0.5;
         double e = (double)pos.getZ() + 0.5;
         int i = 1 << ((MapState)(Object)this).scale;
         double f = (d - (double)((MapState)(Object)this).centerX) / (double)i;
         double g = (e - (double)((MapState)(Object)this).centerZ) / (double)i;
         if (f >= -63.0 && g >= -63.0 && f <= 63.0 && g <= 63.0) {
-            MapMarkerEntity mapMarker = MapMarkerEntity.fromWorldBlock(world, pos);
             if (mapMarker == null) {
                 return false;
             }
@@ -108,6 +107,7 @@ public class MapStateMixin implements MapStateAccessor {
         while (iterator.hasNext()) {
             MapMarkerEntity mapMarker2;
             MapMarkerEntity mapMarker = iterator.next();
+            if (!mapMarker.getType().isDynamic()) continue;
             if (mapMarker.getPos().getX() != x || mapMarker.getPos().getZ() != z || mapMarker.equals(mapMarker2 = MapMarkerEntity.fromWorldBlock(world, mapMarker.getPos()))) continue;
             iterator.remove();
             this.removeIcon(mapMarker.getKey());

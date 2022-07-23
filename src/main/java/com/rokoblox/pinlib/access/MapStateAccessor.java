@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 public interface MapStateAccessor {
-    boolean addMapMarker(WorldAccess world, BlockPos pos);
+    boolean addMapMarker(WorldAccess world, BlockPos pos, MapMarkerEntity mapMarker);
     @Nullable BlockPos removeMapMarker(BlockView world, int x, int z);
     Collection<MapMarkerEntity> getCustomMarkerEntities();
 }

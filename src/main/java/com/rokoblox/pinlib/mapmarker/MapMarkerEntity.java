@@ -26,20 +26,16 @@ public class MapMarkerEntity {
     protected @Nullable Text displayName;
     protected int color = 0xFFFFFF;
 
-    public MapMarkerEntity(MapMarker type, BlockPos pos, @Nullable Text displayName, int color) {
-        this.type = type;
-        this.id = type.getId();
-        this.pos = pos;
-        this.displayName = displayName;
-        this.color = color;
-    }
-
     private MapMarkerEntity(MapMarker type, Identifier id, BlockPos pos, @Nullable Text displayName, int color) {
         this.type = type;
         this.id = id;
         this.pos = pos;
         this.displayName = displayName;
         this.color = color;
+    }
+
+    public MapMarkerEntity(MapMarker type, BlockPos pos, @Nullable Text displayName, int color) {
+        this(type, type.getId(), pos, displayName, color);
     }
 
     public MapMarkerEntity(MapMarker type, BlockPos pos, @Nullable Text displayName) {
@@ -54,7 +50,9 @@ public class MapMarkerEntity {
         BlockState blockState = blockView.getBlockState(blockPos);
         if (blockState.getBlock() instanceof MapMarkedBlock mapMarkedBlock) {
             MapMarker type = mapMarkedBlock.getCustomMarker();
-            Text text = mapMarkedBlock.getMapMarkerName();
+            Text text = null;
+            if (mapMarkedBlock instanceof NamedMapMarkedBlock namedMapMarkedBlock)
+                text = namedMapMarkedBlock.getMapMarkerName();
             return new MapMarkerEntity(type, blockPos, text);
         }
         return null;
