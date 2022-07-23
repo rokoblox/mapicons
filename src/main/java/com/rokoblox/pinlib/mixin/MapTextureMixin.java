@@ -23,7 +23,7 @@ public class MapTextureMixin {
 
     @ModifyVariable(method = "draw", at = @At("STORE"), ordinal = 1)
     private float modify_g(float x) {
-        return pinlib$custom_marker_cache != null ? 0.0f : x;
+        return pinlib$custom_marker_cache != null ? 1.0f : x;
     }
 
     @ModifyVariable(method = "draw", at = @At("STORE"), ordinal = 2)
@@ -33,7 +33,7 @@ public class MapTextureMixin {
 
     @ModifyVariable(method = "draw", at = @At("STORE"), ordinal = 3)
     private float modify_l(float x) {
-        return pinlib$custom_marker_cache != null ? 1.0f : x;
+        return pinlib$custom_marker_cache != null ? 0.0f : x;
     }
 
     @ModifyVariable(method = "draw", at = @At("STORE"), ordinal = 4)
