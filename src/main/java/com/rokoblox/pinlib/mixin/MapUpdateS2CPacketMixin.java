@@ -20,6 +20,6 @@ public class MapUpdateS2CPacketMixin {
 
     @Inject(method = "method_34136", at = @At(value = "RETURN"))
     private static void pinlib$WriteCustomMarkerStates(PacketByteBuf b, MapIcon icon, CallbackInfo ci) {
-        b.writeIdentifier(((MapIconAccessor)icon).getCustomMarker().getId());
+        b.writeIdentifier(((MapIconAccessor)icon).getCustomMarkerType().getId());
     }
 }

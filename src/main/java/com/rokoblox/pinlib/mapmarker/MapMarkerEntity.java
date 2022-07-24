@@ -1,12 +1,15 @@
 package com.rokoblox.pinlib.mapmarker;
 
 import com.rokoblox.pinlib.PinLib;
+import com.rokoblox.pinlib.access.MapIconAccessor;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.map.MapIcon;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Nameable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Nullable;
@@ -24,9 +27,10 @@ public class MapMarkerEntity {
     private final Identifier id; // To preserve the original ID even if it was missing in the currently loaded registry.
     private final BlockPos pos;
     protected @Nullable Text displayName;
-    protected int color = 0xFFFFFF;
+    protected long color = 0xFFFFFFFFL;
+    private MapIcon mapIcon;
 
-    private MapMarkerEntity(MapMarker type, Identifier id, BlockPos pos, @Nullable Text displayName, int color) {
+    private MapMarkerEntity(MapMarker type, Identifier id, BlockPos pos, @Nullable Text displayName, long color) {
         this.type = type;
         this.id = id;
         this.pos = pos;
@@ -34,7 +38,7 @@ public class MapMarkerEntity {
         this.color = color;
     }
 
-    public MapMarkerEntity(MapMarker type, BlockPos pos, @Nullable Text displayName, int color) {
+    public MapMarkerEntity(MapMarker type, BlockPos pos, @Nullable Text displayName, long color) {
         this(type, type.getId(), pos, displayName, color);
     }
 
@@ -51,8 +55,8 @@ public class MapMarkerEntity {
         if (blockState.getBlock() instanceof MapMarkedBlock mapMarkedBlock) {
             MapMarker type = mapMarkedBlock.getCustomMarker();
             Text text = null;
-            if (mapMarkedBlock instanceof NamedMapMarkedBlock namedMapMarkedBlock)
-                text = namedMapMarkedBlock.getMapMarkerName();
+            if (mapMarkedBlock instanceof Nameable namedMapMarkedBlock)
+                text = namedMapMarkedBlock.getDisplayName();
             return new MapMarkerEntity(type, blockPos, text);
         }
         return null;
@@ -62,7 +66,7 @@ public class MapMarkerEntity {
         Identifier id = new Identifier(nbt.getString("Id"));
         MapMarker markerType = PinLib.get(id);
         BlockPos blockPos = NbtHelper.toBlockPos(nbt.getCompound("Pos"));
-        int color = nbt.getInt("Color");
+        long color = nbt.getLong("Color");
         MutableText text = nbt.contains("DisplayName") ? Text.Serializer.fromJson(nbt.getString("DisplayName")) : null;
         return new MapMarkerEntity(markerType, id, blockPos, text, color);
     }
@@ -71,7 +75,10 @@ public class MapMarkerEntity {
         NbtCompound nbtCompound = new NbtCompound();
         nbtCompound.putString("Id", this.id.toString());
         nbtCompound.put("Pos", NbtHelper.fromBlockPos(this.pos));
-        nbtCompound.putInt("Color", this.color);
+        if (this.mapIcon != null)
+            nbtCompound.putLong("Color", ((MapIconAccessor) this.mapIcon).getColor());
+        else
+            nbtCompound.putLong("Color", 0xFFFFFFFFL);
         if (this.displayName != null) {
             nbtCompound.putString("DisplayName", Text.Serializer.toJson(this.displayName));
         }
@@ -82,6 +89,18 @@ public class MapMarkerEntity {
         return type;
     }
 
+    /**
+     * Gets the actual ID of the marker, this
+     * is sometimes different from the ID of
+     * the marker type when a world with a
+     * marker that was previously registered
+     * but not anymore is loaded.
+     * The original marker ID stays in the
+     * saved NBT data to preserve the original
+     * marker type if the original mod is loaded
+     * again.
+     * @return Identifier
+     */
     public Identifier getId() {
         return id;
     }
@@ -90,20 +109,13 @@ public class MapMarkerEntity {
         return pos;
     }
 
+    @Nullable
     public Text getDisplayName() {
         return displayName;
     }
 
-    public void setDisplayName(Text displayName) {
+    public void setDisplayName(@Nullable Text displayName) {
         this.displayName = displayName;
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
     }
 
     public boolean equals(Object o) {
@@ -126,7 +138,18 @@ public class MapMarkerEntity {
     }
 
     public String getKey() {
-        return this.id.toString() + "-" + this.pos.getX() + "," + this.pos.getY() + "," + this.pos.getZ();
+        return this.id.toString() + "." + this.pos.getX() + "," + this.pos.getY() + "," + this.pos.getZ();
     }
 
+    public void setIcon(MapIcon icon) {
+        this.mapIcon = icon;
+    }
+
+    public MapIcon getIcon() {
+        return this.mapIcon;
+    }
+
+    public long getColor() {
+        return this.color;
+    }
 }

@@ -28,7 +28,7 @@ public class PinLib implements ModInitializer {
      */
     @Override
     public void onInitialize() {
-        TestingClass.init(LOGGER); // Used for testing purposes only.
+        TestingClass.init(); // Used for testing purposes only.
     }
 
     /**
@@ -45,6 +45,7 @@ public class PinLib implements ModInitializer {
      * @return Static MapMarker
      */
     public static MapMarker createStaticMarker(Identifier id) {
+        LOGGER.info("Creating new custom marker marker with id: " + id.toString());
         return Registry.register(REGISTRY, id, new MapMarker(id, false));
     }
 
@@ -65,6 +66,7 @@ public class PinLib implements ModInitializer {
      * @return Static MapMarker
      */
     public static MapMarker createDynamicMarker(Identifier id) {
+        LOGGER.info("Creating new custom marker marker with id: " + id.toString());
         return Registry.register(REGISTRY, id, new MapMarker(id, true));
     }
 

@@ -3,7 +3,6 @@ package com.rokoblox.pinlib.mixin;
 import com.google.common.collect.Maps;
 import com.rokoblox.pinlib.access.MapIconAccessor;
 import com.rokoblox.pinlib.access.MapStateAccessor;
-import com.rokoblox.pinlib.mapmarker.MapMarker;
 import com.rokoblox.pinlib.mapmarker.MapMarkerEntity;
 import net.minecraft.item.map.MapIcon;
 import net.minecraft.item.map.MapState;
@@ -40,8 +39,7 @@ public class MapStateMixin implements MapStateAccessor {
     private final Map<String, MapMarkerEntity> pinlib$customMarkerEntities = Maps.newHashMap();
 
     @Unique
-    @Nullable
-    private MapMarker pinlib$customIconMarkerToAdd;
+    private MapMarkerEntity pinlib$customIconMarkerToAdd;
 
     @Inject(method = "fromNbt", at = @At("TAIL"))
     private static void pinlib$loadCustomMarkersNBT(NbtCompound nbt, CallbackInfoReturnable<MapState> cir) {
@@ -50,7 +48,7 @@ public class MapStateMixin implements MapStateAccessor {
         for (int k = 0; k < nbtList.size(); ++k) {
             MapMarkerEntity mapMarker = MapMarkerEntity.fromNbt(nbtList.getCompound(k));
             ((MapStateMixin)(Object)mapState).pinlib$customMarkerEntities.put(mapMarker.getKey(), mapMarker);
-            ((MapStateMixin)(Object)mapState).pinlib$customIconMarkerToAdd = mapMarker.getType();
+            ((MapStateMixin)(Object)mapState).pinlib$customIconMarkerToAdd = mapMarker;
             ((MapStateMixin)(Object)mapState).addIcon(MapIcon.Type.TARGET_POINT, null, mapMarker.getKey(), mapMarker.getPos().getX(), mapMarker.getPos().getZ(), 180.0, mapMarker.getDisplayName());
         }
     }
@@ -71,8 +69,11 @@ public class MapStateMixin implements MapStateAccessor {
 
     @ModifyVariable(method = "addIcon", at = @At("STORE"))
     private MapIcon markIconAsCustomIcon(MapIcon icon) {
-        if (pinlib$customIconMarkerToAdd != null)
-            ((MapIconAccessor)icon).setCustomMarker(pinlib$customIconMarkerToAdd);
+        if (pinlib$customIconMarkerToAdd != null) {
+            ((MapIconAccessor)icon).setCustomMarker(pinlib$customIconMarkerToAdd.getType());
+            ((MapIconAccessor)icon).color(pinlib$customIconMarkerToAdd.getColor());
+            pinlib$customIconMarkerToAdd.setIcon(icon);
+        }
         pinlib$customIconMarkerToAdd = null;
         return icon;
     }
@@ -93,7 +94,7 @@ public class MapStateMixin implements MapStateAccessor {
             }
             if (!((MapState)(Object)this).method_37343(256)) {
                 this.pinlib$customMarkerEntities.put(mapMarker.getKey(), mapMarker);
-                pinlib$customIconMarkerToAdd = mapMarker.getType();
+                pinlib$customIconMarkerToAdd = mapMarker;
                 addIcon(MapIcon.Type.TARGET_POINT, world, mapMarker.getKey(), d, e, 180.0, mapMarker.getDisplayName());
                 return true;
             }

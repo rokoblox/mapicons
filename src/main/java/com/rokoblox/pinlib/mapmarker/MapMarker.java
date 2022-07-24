@@ -1,8 +1,8 @@
 package com.rokoblox.pinlib.mapmarker;
 
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.item.map.MapIcon;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -38,6 +38,7 @@ public class MapMarker {
         return Objects.hash("pinLibMapMarker", this.id, this.dynamic);
     }
 
+    @NotNull
     public Identifier getId() {
         return this.id;
     }
