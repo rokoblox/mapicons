@@ -3,7 +3,7 @@
   "id": "pinlib",
   "version": "${version}",
   "name": "PinLib",
-  "description": "A minecraft library to add map icons and markers for fabric mod loader.",
+  "description": "A lightweight minecraft library to add map icons and markers for fabric mod loader.",
   "authors": [
     "rokoblox"
   ],
