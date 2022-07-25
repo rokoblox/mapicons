@@ -57,7 +57,7 @@ public class MapMarkerEntity {
             Text text = null;
             if (mapMarkedBlock instanceof Nameable namedMapMarkedBlock)
                 text = namedMapMarkedBlock.getDisplayName();
-            return new MapMarkerEntity(type, blockPos, text);
+            return new MapMarkerEntity(type, blockPos, text, mapMarkedBlock.getMarkerColor());
         }
         return null;
     }

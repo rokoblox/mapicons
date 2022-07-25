@@ -102,14 +102,12 @@ public class MapStateMixin implements MapStateAccessor {
         return false;
     }
 
-    @SuppressWarnings({"TooBroadScope", "UnclearExpression"})
     public @Nullable BlockPos removeMapMarker(BlockView world, int x, int z) {
         Iterator<MapMarkerEntity> iterator = this.pinlib$customMarkerEntities.values().iterator();
         while (iterator.hasNext()) {
-            MapMarkerEntity mapMarker2;
             MapMarkerEntity mapMarker = iterator.next();
             if (!mapMarker.getType().isDynamic()) continue;
-            if (mapMarker.getPos().getX() != x || mapMarker.getPos().getZ() != z || mapMarker.equals(mapMarker2 = MapMarkerEntity.fromWorldBlock(world, mapMarker.getPos()))) continue;
+            if (mapMarker.getPos().getX() != x || mapMarker.getPos().getZ() != z || mapMarker.equals(MapMarkerEntity.fromWorldBlock(world, mapMarker.getPos()))) continue;
             iterator.remove();
             this.removeIcon(mapMarker.getKey());
             return mapMarker.getPos();

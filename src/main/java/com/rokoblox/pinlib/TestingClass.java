@@ -31,10 +31,10 @@ class TestBlock extends Block implements MapMarkedBlock, Nameable {
         return TestingClass.TESTMARKER;
     }
 
-    @Override // Default method returns 0xFFFFFFFF (white)
-    public int getMarkerColor() {
+    @Override // Default method returns 0xFFFFFFFFL (white)
+    public long getMarkerColor() {
         // Use net.minecraft.util.math.ColorHelper to get integer from RGB values.
-        return 0xFFFF0000; // (argb) -> 255, 255, 0, 0
+        return 0xFFFF0000L; // (argb) -> 255, 255, 0, 0
     }
 
     @Override

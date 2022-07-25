@@ -33,7 +33,7 @@ public class FilledMapItemMixin {
     private void pinlib$UpdateCustomMarkers(Args args, World world, Entity entity, MapState state) {
         BlockPos removalPos;
         if ((removalPos = ((MapStateAccessor)state).removeMapMarker(world, args.get(1), args.get(2))) != null)
-            ((MapStateAccessor)state).addMapMarker(world, removalPos, null);
+            ((MapStateAccessor)state).addMapMarker(world, removalPos, MapMarkerEntity.fromWorldBlock(world, removalPos));
     }
 
     @ModifyVariable(method = "useOnBlock", at = @At(value = "STORE"), ordinal = 0)

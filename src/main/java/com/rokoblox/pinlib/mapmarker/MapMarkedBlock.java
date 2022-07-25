@@ -11,7 +11,7 @@ public interface MapMarkedBlock {
     default MapMarker getCustomMarker() {
         return PinLib.getDefaultMarker();
     }
-    default int getMarkerColor() {
-        return 0xFFFFFFFF;
+    default long getMarkerColor() {
+        return 0xFFFFFFFFL;
     }
 }
