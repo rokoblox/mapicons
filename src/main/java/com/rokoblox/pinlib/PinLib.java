@@ -28,7 +28,7 @@ public class PinLib implements ModInitializer {
      */
     @Override
     public void onInitialize() {
-        TestingClass.init(); // Used for testing purposes only.
+//        TestingClass.init(); // Used for testing purposes only.
     }
 
     /**
@@ -45,7 +45,7 @@ public class PinLib implements ModInitializer {
      * @return Static MapMarker
      */
     public static MapMarker createStaticMarker(Identifier id) {
-        LOGGER.info("Creating new custom marker marker with id: " + id.toString());
+        LOGGER.info("Registering new static map marker with id [{}]", id.toString());
         return Registry.register(REGISTRY, id, new MapMarker(id, false));
     }
 
@@ -66,7 +66,7 @@ public class PinLib implements ModInitializer {
      * @return Static MapMarker
      */
     public static MapMarker createDynamicMarker(Identifier id) {
-        LOGGER.info("Creating new custom marker marker with id: " + id.toString());
+        LOGGER.info("Registering new dynamic map marker with id [{}]", id.toString());
         return Registry.register(REGISTRY, id, new MapMarker(id, true));
     }
 
@@ -81,11 +81,13 @@ public class PinLib implements ModInitializer {
      * @return Provided MapState
      */
     public static MapMarkerEntity addMapMarker(MapState mapState, @Nullable World world, BlockPos pos, @Nullable MapMarker markerType, @Nullable Text displayName) {
-        MapMarkerEntity mapMarker;
-        if (markerType == null)
+        MapMarkerEntity mapMarker = null;
+        if (markerType == null && world != null)
             mapMarker = MapMarkerEntity.fromWorldBlock(world, pos);
-        else
+        else if (markerType != null)
             mapMarker = new MapMarkerEntity(markerType, pos, displayName);
+        if (mapMarker == null)
+            return null;
         return ((MapStateAccessor) mapState).addMapMarker(world, pos, mapMarker) ? mapMarker : null;
     }
 
@@ -95,11 +97,11 @@ public class PinLib implements ModInitializer {
      * map and contains a valid MapState.
      *
      * @param stack      The item stack which the marker will be added to
-     * @param world      Not sure what this does, it's just something minecraft has in its code that apparently changes icon rotation based on lighting...?
+     * @param world      World to get the map state from
      * @param markerType Map marker type
      * @return Provided MapState
      */
-    public static MapMarkerEntity tryAddMapMarker(ItemStack stack, @Nullable World world, BlockPos pos, @Nullable MapMarker markerType, @Nullable Text displayName) {
+    public static MapMarkerEntity tryAddMapMarker(ItemStack stack, World world, BlockPos pos, @Nullable MapMarker markerType, @Nullable Text displayName) {
         MapState mapState = FilledMapItem.getOrCreateMapState(stack, world);
         if (mapState != null) {
             return addMapMarker(mapState, world, pos, markerType, displayName);
@@ -108,19 +110,43 @@ public class PinLib implements ModInitializer {
     }
 
     /**
-     * @TODO: 22/07/2022
-     * @param mapState Modified MapState
-     * @param marker Removed MapMarker
-     * @param pos Block Position to remove marker
+     * Removes a map marker at the specified
+     * BlockPos, if markerType is not null it
+     * will only remove the marker at that
+     * position if it's of that type.
+     *
+     * @param mapState   State to edit
+     * @param x          X position of the marker
+     * @param z          Z position on the marker
+     * @param markerType The markerType to remove, null for any.
      * @return Provided MapState
      */
-    public static MapState removeMapMarker(MapState mapState, MapMarker marker, BlockPos pos) {
-        return mapState;
+    public static boolean removeMapMarker(MapState mapState, int x, int z, @Nullable MapMarker markerType) {
+        return ((MapStateAccessor) mapState).removeMapMarker(null, x, z, false, markerType) != null;
+    }
+
+    /**
+     * Tries to remove a map marker from the
+     * provided ItemStack if it's a valid
+     * map and contains a valid MapState.
+     *
+     * @param stack      The item stack which the marker will be removed from
+     * @param world      World to get the map state from
+     * @param markerType Map marker type
+     * @return Is successful?
+     */
+    public static boolean tryRemoveMapMarker(ItemStack stack, World world, BlockPos pos, @Nullable MapMarker markerType, @Nullable Text displayName) {
+        MapState mapState = FilledMapItem.getOrCreateMapState(stack, world);
+        if (mapState != null) {
+            return removeMapMarker(mapState, pos.getX(), pos.getZ(), markerType);
+        }
+        return false;
     }
 
     public static MapMarker get(Identifier id) {
         return REGISTRY.get(id);
     }
+
     public static MapMarker getDefaultMarker() {
         return DEFAULT_MARKER;
     }

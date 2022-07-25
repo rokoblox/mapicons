@@ -3,6 +3,7 @@ package com.rokoblox.pinlib.mixin;
 import com.google.common.collect.Maps;
 import com.rokoblox.pinlib.access.MapIconAccessor;
 import com.rokoblox.pinlib.access.MapStateAccessor;
+import com.rokoblox.pinlib.mapmarker.MapMarker;
 import com.rokoblox.pinlib.mapmarker.MapMarkerEntity;
 import net.minecraft.item.map.MapIcon;
 import net.minecraft.item.map.MapState;
@@ -88,11 +89,13 @@ public class MapStateMixin implements MapStateAccessor {
             if (mapMarker == null) {
                 return false;
             }
-            if (this.pinlib$customMarkerEntities.remove(mapMarker.getKey(), mapMarker)) {
-                removeIcon(mapMarker.getKey());
-                return true;
-            }
-            if (!((MapState)(Object)this).method_37343(256)) {
+            MapMarkerEntity mapMarkerTemp = getMapMarker(pos.getX(), pos.getZ());
+            if (mapMarkerTemp != null && mapMarkerTemp.equals(mapMarker))
+                return false;
+            if ((mapMarkerTemp = getMapMarker(pos.getX(), pos.getZ())) != null && this.pinlib$customMarkerEntities.remove(mapMarkerTemp.getKey()) != null)
+                removeIcon(mapMarkerTemp.getKey());
+
+            if (!((MapState) (Object) this).method_37343(256)) {
                 this.pinlib$customMarkerEntities.put(mapMarker.getKey(), mapMarker);
                 pinlib$customIconMarkerToAdd = mapMarker;
                 addIcon(MapIcon.Type.TARGET_POINT, world, mapMarker.getKey(), d, e, 180.0, mapMarker.getDisplayName());
@@ -102,15 +105,28 @@ public class MapStateMixin implements MapStateAccessor {
         return false;
     }
 
-    public @Nullable BlockPos removeMapMarker(BlockView world, int x, int z) {
+    public @Nullable MapMarkerEntity removeMapMarker(@Nullable BlockView world, int x, int z, boolean keepStatic, @Nullable MapMarker markerType) {
         Iterator<MapMarkerEntity> iterator = this.pinlib$customMarkerEntities.values().iterator();
         while (iterator.hasNext()) {
             MapMarkerEntity mapMarker = iterator.next();
-            if (!mapMarker.getType().isDynamic()) continue;
-            if (mapMarker.getPos().getX() != x || mapMarker.getPos().getZ() != z || mapMarker.equals(MapMarkerEntity.fromWorldBlock(world, mapMarker.getPos()))) continue;
+            if (!mapMarker.getType().isDynamic() && keepStatic) continue;
+            if (markerType != null && mapMarker.getType() != markerType) continue;
+            if (mapMarker.getPos().getX() != x || mapMarker.getPos().getZ() != z)
+                continue;
+            if (world != null && mapMarker.equals(MapMarkerEntity.fromWorldBlock(world, mapMarker.getPos())))
+                continue;
             iterator.remove();
             this.removeIcon(mapMarker.getKey());
-            return mapMarker.getPos();
+            return mapMarker;
+        }
+        return null;
+    }
+
+    @Override
+    public @Nullable MapMarkerEntity getMapMarker(int x, int z) {
+        for (MapMarkerEntity mapMarker : this.pinlib$customMarkerEntities.values()) {
+            if (mapMarker.getPos().getX() == x && mapMarker.getPos().getZ() == z)
+                return mapMarker;
         }
         return null;
     }

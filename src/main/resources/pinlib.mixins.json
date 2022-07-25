@@ -7,10 +7,10 @@
     "FilledMapItemMixin",
     "MapIconMixin",
     "MapStateMixin",
-    "MapTextureMixin",
     "MapUpdateS2CPacketMixin"
   ],
   "client": [
+    "MapTextureMixin"
   ],
   "injectors": {
     "defaultRequire": 1
