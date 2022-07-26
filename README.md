@@ -5,6 +5,8 @@
 
 A lightweight minecraft library to add map icons and markers for fabric mod loader.
 
+[Modrinth Page](https://modrinth.com/mod/pinlib)
+
 ## How to add to your build.gradle
 
 You can add the mod to your build.gradle file with 2 ways.
