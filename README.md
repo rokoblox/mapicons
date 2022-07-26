@@ -32,18 +32,4 @@ dependencies {
 ```
 See [dependency scope](https://docs.modrinth.com/docs/tutorials/maven/#dependency-scope) to know the difference between `modImplementation`, `modApi` and `include`.
 
-### [JitPack](https://jitpack.io/)
-
-```gradle
-repositories {
-    // Your repositories...
-    maven { url 'https://jitpack.io' }
-}
-
-dependencies {
-    // Your dependencies....
-    implementation 'com.github.rokoblox:pinlib:latestdev' // or specific version.
-}
-```
-
 Happy coding!
