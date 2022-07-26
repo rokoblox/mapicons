@@ -88,7 +88,10 @@ public class PinLib implements ModInitializer {
             mapMarker = new MapMarkerEntity(markerType, pos, displayName);
         if (mapMarker == null)
             return null;
-        return ((MapStateAccessor) mapState).addMapMarker(world, pos, mapMarker) ? mapMarker : null;
+        boolean success = ((MapStateAccessor) mapState).addMapMarker(world, pos, mapMarker);
+        if (success)
+            PinLib.LOGGER.info("Added map marker with id [{}] at: [{}]", mapMarker.getId().toString(), pos.toShortString());
+        return success ? mapMarker : null;
     }
 
     /**
@@ -122,7 +125,10 @@ public class PinLib implements ModInitializer {
      * @return Provided MapState
      */
     public static boolean removeMapMarker(MapState mapState, int x, int z, @Nullable MapMarker markerType) {
-        return ((MapStateAccessor) mapState).removeMapMarker(null, x, z, false, markerType) != null;
+        MapMarkerEntity removeMapMarker = ((MapStateAccessor) mapState).removeMapMarker(null, x, z, false, markerType);
+        if (removeMapMarker != null)
+            PinLib.LOGGER.info("Removed map marker with id [{}] at: [{}]", removeMapMarker.getId(), removeMapMarker.getPos().toShortString());
+        return removeMapMarker != null;
     }
 
     /**

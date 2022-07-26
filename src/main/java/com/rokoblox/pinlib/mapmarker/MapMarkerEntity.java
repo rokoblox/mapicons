@@ -9,9 +9,8 @@ import net.minecraft.nbt.NbtHelper;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Nameable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -50,13 +49,11 @@ public class MapMarkerEntity {
     }
 
     @Nullable
-    public static MapMarkerEntity fromWorldBlock(BlockView blockView, BlockPos blockPos) {
-        BlockState blockState = blockView.getBlockState(blockPos);
+    public static MapMarkerEntity fromWorldBlock(World world, BlockPos blockPos) {
+        BlockState blockState = world.getBlockState(blockPos);
         if (blockState.getBlock() instanceof MapMarkedBlock mapMarkedBlock) {
             MapMarker type = mapMarkedBlock.getCustomMarker();
-            Text text = null;
-            if (mapMarkedBlock instanceof Nameable namedMapMarkedBlock)
-                text = namedMapMarkedBlock.getDisplayName();
+            Text text = mapMarkedBlock.getDisplayName(world, blockPos);
             return new MapMarkerEntity(type, blockPos, text, mapMarkedBlock.getMarkerColor());
         }
         return null;

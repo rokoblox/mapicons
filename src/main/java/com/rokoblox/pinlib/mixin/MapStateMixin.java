@@ -12,7 +12,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -105,7 +105,7 @@ public class MapStateMixin implements MapStateAccessor {
         return false;
     }
 
-    public @Nullable MapMarkerEntity removeMapMarker(@Nullable BlockView world, int x, int z, boolean keepStatic, @Nullable MapMarker markerType) {
+    public @Nullable MapMarkerEntity removeMapMarker(@Nullable World world, int x, int z, boolean keepStatic, @Nullable MapMarker markerType) {
         Iterator<MapMarkerEntity> iterator = this.pinlib$customMarkerEntities.values().iterator();
         while (iterator.hasNext()) {
             MapMarkerEntity mapMarker = iterator.next();

@@ -10,7 +10,9 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Nameable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.BlockView;
 
 public class TestingClass {
 
@@ -25,7 +27,7 @@ public class TestingClass {
     }
 }
 
-class TestBlock extends Block implements MapMarkedBlock, Nameable {
+class TestBlock extends Block implements MapMarkedBlock {
     public TestBlock(Settings settings) {
         super(settings);
     }
@@ -42,7 +44,7 @@ class TestBlock extends Block implements MapMarkedBlock, Nameable {
     }
 
     @Override
-    public Text getDisplayName() {
+    public Text getDisplayName(BlockView world, BlockPos pos) {
         // It's a good idea to not leave style as null since the loaded
         // map markers from NBT always load with an empty style, thus
         // the game thinks the loaded display name and the one here
