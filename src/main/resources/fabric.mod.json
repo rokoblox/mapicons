@@ -11,7 +11,7 @@
     "repo": "https://github.com/rokoblox/pinlib.git"
   },
   "license": "MIT",
-  "icon": "assets/pinlib/icon.png",
+  "icon": "assets/pinlib/textures/map/icons/default.png",
   "environment": "*",
   "entrypoints": {
     "main": [

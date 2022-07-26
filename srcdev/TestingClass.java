@@ -1,6 +1,6 @@
 package com.rokoblox.pinlib;
 
-import com.rokoblox.pinlib.mapmarker.MapMarkedBlock;
+import com.rokoblox.pinlib.mapmarker.IMapMarkedBlock;
 import com.rokoblox.pinlib.mapmarker.MapMarker;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -27,7 +27,7 @@ public class TestingClass {
     }
 }
 
-class TestBlock extends Block implements MapMarkedBlock {
+class TestBlock extends Block implements IMapMarkedBlock {
     public TestBlock(Settings settings) {
         super(settings);
     }

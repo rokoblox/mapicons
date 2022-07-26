@@ -10,12 +10,12 @@ import net.minecraft.world.BlockView;
  * <p>
  * Implement in your Block class to use it as a MapMarker.
  */
-public interface MapMarkedBlock {
+public interface IMapMarkedBlock {
     default MapMarker getCustomMarker() {
         return PinLib.getDefaultMarker();
     }
 
-    default long getMarkerColor() {
+    default long getMarkerColor(BlockView world, BlockPos pos) {
         return 0xFFFFFFFFL;
     }
 

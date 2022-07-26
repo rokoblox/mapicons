@@ -1,6 +1,7 @@
 package com.rokoblox.pinlib;
 
 import com.rokoblox.pinlib.access.MapStateAccessor;
+import com.rokoblox.pinlib.mapmarker.IMapMarkedBlock;
 import com.rokoblox.pinlib.mapmarker.MapMarker;
 import com.rokoblox.pinlib.mapmarker.MapMarkerEntity;
 import net.fabricmc.api.ModInitializer;
@@ -145,6 +146,46 @@ public class PinLib implements ModInitializer {
         MapState mapState = FilledMapItem.getOrCreateMapState(stack, world);
         if (mapState != null) {
             return removeMapMarker(mapState, pos.getX(), pos.getZ(), markerType);
+        }
+        return false;
+    }
+
+    /**
+     * Attempts to add a map marker on the provided
+     * stack if it is a valid map with a valid map
+     * state.
+     * <p>
+     * If there is already a map marker in the given
+     * location, it will try to remove it instead.
+     * </p>
+     * This behaves as if the player clicked on a
+     * block that implements {@link IMapMarkedBlock}
+     * with a {@link FilledMapItem}.
+     *
+     * @param stack    ItemStack to try to get a map state from
+     * @param world    World containing the block
+     * @param blockPos Position of the block
+     * @return Whether the action succeeded or not
+     */
+    public static boolean tryUseOnMarkableBlock(ItemStack stack, World world, BlockPos blockPos) {
+        MapStateAccessor mapState = (MapStateAccessor) FilledMapItem.getOrCreateMapState(stack, world);
+        if (mapState == null)
+            return false;
+        MapMarkerEntity mapMarker = MapMarkerEntity.fromWorldBlock(world, blockPos);
+        if (mapState.addMapMarker(world, blockPos, mapMarker)) {
+            if (mapMarker == null)
+                return false;
+            PinLib.LOGGER.info("Added map marker with id [{}] at: [{}]", mapMarker.getId().toString(), blockPos.toShortString());
+            return true;
+        } else if ((mapMarker = mapState.removeMapMarker(
+                null,
+                blockPos.getX(),
+                blockPos.getZ(),
+                !(world.getBlockState(blockPos).getBlock() instanceof IMapMarkedBlock),
+                null
+        )) != null) {
+            PinLib.LOGGER.info("Removed map marker with id [{}] at: [{}]", mapMarker.getId(), blockPos.toShortString());
+            return true;
         }
         return false;
     }

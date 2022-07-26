@@ -2,7 +2,6 @@ package com.rokoblox.pinlib.mixin;
 
 import com.rokoblox.pinlib.PinLib;
 import com.rokoblox.pinlib.access.MapStateAccessor;
-import com.rokoblox.pinlib.mapmarker.MapMarkedBlock;
 import com.rokoblox.pinlib.mapmarker.MapMarkerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.FilledMapItem;
@@ -34,19 +33,7 @@ public abstract class FilledMapItemMixin {
         MapStateAccessor mapState = (MapStateAccessor) FilledMapItem.getOrCreateMapState(context.getStack(), context.getWorld());
         if (mapState == null)
             return;
-        MapMarkerEntity mapMarker = MapMarkerEntity.fromWorldBlock(context.getWorld(), context.getBlockPos());
-        if (mapState.addMapMarker(context.getWorld(), context.getBlockPos(), mapMarker)) {
-            PinLib.LOGGER.info("Added map marker with id [{}] at: [{}]", mapMarker.getId().toString(), context.getBlockPos().toShortString());
+        if (PinLib.tryUseOnMarkableBlock(context.getStack(), context.getWorld(), context.getBlockPos()))
             cir.setReturnValue(ActionResult.SUCCESS);
-        } else if ((mapMarker = mapState.removeMapMarker(
-                null,
-                context.getBlockPos().getX(),
-                context.getBlockPos().getZ(),
-                !(context.getWorld().getBlockState(context.getBlockPos()).getBlock() instanceof MapMarkedBlock),
-                null
-        )) != null) {
-            PinLib.LOGGER.info("Removed map marker with id [{}] at: [{}]", mapMarker.getId(), context.getBlockPos().toShortString());
-            cir.setReturnValue(ActionResult.SUCCESS);
-        }
     }
 }

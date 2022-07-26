@@ -51,10 +51,10 @@ public class MapMarkerEntity {
     @Nullable
     public static MapMarkerEntity fromWorldBlock(World world, BlockPos blockPos) {
         BlockState blockState = world.getBlockState(blockPos);
-        if (blockState.getBlock() instanceof MapMarkedBlock mapMarkedBlock) {
+        if (blockState.getBlock() instanceof IMapMarkedBlock mapMarkedBlock) {
             MapMarker type = mapMarkedBlock.getCustomMarker();
             Text text = mapMarkedBlock.getDisplayName(world, blockPos);
-            return new MapMarkerEntity(type, blockPos, text, mapMarkedBlock.getMarkerColor());
+            return new MapMarkerEntity(type, blockPos, text, mapMarkedBlock.getMarkerColor(world, blockPos));
         }
         return null;
     }
