@@ -1,7 +1,7 @@
 # pinlib
-![Modrinth](https://img.shields.io/modrinth/dt/pinlib?label=modrinth&color=green&style=for-the-badge)
-![GitHub release (latest by SemVer including pre-releases)](https://img.shields.io/github/downloads/rokoblox/pinlib/latest/total?color=aaaaff&label=latest%20release&sort=semver&style=for-the-badge)
-![GitHub release (latest by SemVer including pre-releases)](https://img.shields.io/github/downloads-pre/rokoblox/pinlib/latest/total?color=6666bb&label=latest%20pre-release&sort=semver&style=for-the-badge)
+[![Modrinth](https://img.shields.io/modrinth/dt/pinlib?label=modrinth&color=green&style=for-the-badge)](https://modrinth.com/mod/pinlib)
+[![GitHub release (latest by SemVer including pre-releases)](https://img.shields.io/github/downloads/rokoblox/pinlib/latest/total?color=aaaaff&label=latest%20release&sort=semver&style=for-the-badge)](https://github.com/rokoblox/pinlib/releases)
+[![GitHub release (latest by SemVer including pre-releases)](https://img.shields.io/github/downloads-pre/rokoblox/pinlib/latest/total?color=6666bb&label=latest%20pre-release&sort=semver&style=for-the-badge)](https://github.com/rokoblox/pinlib/releases)
 
 A lightweight minecraft library to add map icons and markers for fabric mod loader.
 
