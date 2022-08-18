@@ -9,7 +9,6 @@ import net.minecraft.block.Material;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Nameable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
@@ -38,7 +37,7 @@ class TestBlock extends Block implements IMapMarkedBlock {
     }
 
     @Override // Default method returns 0xFFFFFFFFL (white)
-    public long getMarkerColor() {
+    public long getMarkerColor(BlockView world, BlockPos pos) {
         // Use net.minecraft.util.math.ColorHelper to get integer from RGB values.
         return 0xFFFFFFFFL; // (argb) -> 255, 255, 0, 0
     }
