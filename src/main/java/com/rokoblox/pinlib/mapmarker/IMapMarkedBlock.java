@@ -10,6 +10,8 @@ import net.minecraft.world.BlockView;
  * <p>
  * Implement in your Block class to use it as a MapMarker.
  */
+@SuppressWarnings("DeprecatedIsStillUsed")
+@Deprecated
 public interface IMapMarkedBlock {
     default MapMarker getCustomMarker() {
         return PinLib.getDefaultMarker();

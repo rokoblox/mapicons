@@ -1,11 +1,11 @@
 package com.rokoblox.pinlib;
 
 import com.rokoblox.pinlib.access.MapStateAccessor;
-import com.rokoblox.pinlib.mapmarker.IMapMarkedBlock;
-import com.rokoblox.pinlib.mapmarker.MapMarker;
-import com.rokoblox.pinlib.mapmarker.MapMarkerEntity;
+import com.rokoblox.pinlib.mapmarker.*;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.map.MapState;
@@ -18,10 +18,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+
 public class PinLib implements ModInitializer {
 
     public static final Logger LOGGER = LogManager.getLogger("PinLib");
-    private static final Registry<MapMarker> REGISTRY = FabricRegistryBuilder.createDefaulted(MapMarker.class, new Identifier("pinlib", "map_markers"), new Identifier("pinlib", "default")).buildAndRegister();
+    private static final Registry<MapMarker> MAP_MARKER_REGISTRY = FabricRegistryBuilder.createDefaulted(MapMarker.class, new Identifier("pinlib", "map_markers"), new Identifier("pinlib", "default")).buildAndRegister();
+    private static final Registry<MapMarkedBlock> MAP_MARKED_BLOCKS_REGISTRY = FabricRegistryBuilder.createSimple(MapMarkedBlock.class, new Identifier("pinlib", "map_marked_blocks")).buildAndRegister();
     private static final MapMarker DEFAULT_MARKER = createStaticMarker(new Identifier("pinlib", "default"));
 
     /**
@@ -47,7 +50,7 @@ public class PinLib implements ModInitializer {
      */
     public static MapMarker createStaticMarker(Identifier id) {
         LOGGER.info("Registering new static map marker with id [{}]", id.toString());
-        return Registry.register(REGISTRY, id, new MapMarker(id, false));
+        return Registry.register(MAP_MARKER_REGISTRY, id, new MapMarker(id, false));
     }
 
     /**
@@ -68,7 +71,42 @@ public class PinLib implements ModInitializer {
      */
     public static MapMarker createDynamicMarker(Identifier id) {
         LOGGER.info("Registering new dynamic map marker with id [{}]", id.toString());
-        return Registry.register(REGISTRY, id, new MapMarker(id, true));
+        return Registry.register(MAP_MARKER_REGISTRY, id, new MapMarker(id, true));
+    }
+
+    /**
+     * Creates and registers a {@link com.rokoblox.pinlib.mapmarker.MapMarkedBlock}
+     * for the provided block with
+     * the provided methods.
+     *
+     * @param entry               Block to register
+     * @param markerProvider      You can use `() -> PinLib.getDefaultMarker()` as a default value.
+     * @param colorProvider       You can use `(world, pos) -> 0xFFFFFFFFL` as a default value.
+     * @param displayNameProvider You can use `(BlockView world, BlockPos pos) -> null` as a default value.
+     * @return Provided entry
+     */
+    public static MapMarkedBlock registerMapMarkedBlock(Block entry, CustomMarkerProvider markerProvider, MarkerColorProvider colorProvider, MarkerDisplayNameProvider displayNameProvider) {
+        Identifier id = Registry.BLOCK.getId(entry);
+        if (id == Registry.BLOCK.getDefaultId())
+            LOGGER.warn("Registering default ID [{}] as a map marked block, this might be because the provided block entry was not registered as a block first.", id.toString());
+        LOGGER.info("Registering block with id [{}] as a map marked block.", id.toString());
+        return Registry.register(MAP_MARKED_BLOCKS_REGISTRY, id, new MapMarkedBlock(entry, markerProvider, colorProvider, displayNameProvider));
+    }
+
+    /**
+     * Returns a {@link MapMarkedBlock} for the provided
+     * block if the block was previously registered with
+     * registerMapMarkedBlock(...) or null if not.
+     * <p>
+     * This method uses caching for performance,
+     * manually optimizing results is not needed.
+     * </p>
+     *
+     * @param block Block to find {@link MapMarkedBlock} for
+     * @return Matching {@link MapMarkedBlock}, null if none was found in registry.
+     */
+    public static MapMarkedBlock getMapMarkedBlock(Block block) {
+        return MapMarkedBlockCache.fromBlock(block);
     }
 
     /**
@@ -167,11 +205,13 @@ public class PinLib implements ModInitializer {
      * @param blockPos Position of the block
      * @return Whether the action succeeded or not
      */
+    @SuppressWarnings("deprecation")
     public static boolean tryUseOnMarkableBlock(ItemStack stack, World world, BlockPos blockPos) {
         MapStateAccessor mapState = (MapStateAccessor) FilledMapItem.getOrCreateMapState(stack, world);
         if (mapState == null)
             return false;
         MapMarkerEntity mapMarker = MapMarkerEntity.fromWorldBlock(world, blockPos);
+        BlockState blockState = world.getBlockState(blockPos);
         if (mapState.addMapMarker(world, blockPos, mapMarker)) {
             if (mapMarker == null)
                 return false;
@@ -181,7 +221,7 @@ public class PinLib implements ModInitializer {
                 null,
                 blockPos.getX(),
                 blockPos.getZ(),
-                !(world.getBlockState(blockPos).getBlock() instanceof IMapMarkedBlock),
+                !(blockState.getBlock() instanceof IMapMarkedBlock) && (getMapMarkedBlock(blockState.getBlock()) == null),
                 null
         )) != null) {
             PinLib.LOGGER.info("Removed map marker with id [{}] at: [{}]", mapMarker.getId(), blockPos.toShortString());
@@ -191,10 +231,24 @@ public class PinLib implements ModInitializer {
     }
 
     public static MapMarker get(Identifier id) {
-        return REGISTRY.get(id);
+        return MAP_MARKER_REGISTRY.get(id);
     }
 
     public static MapMarker getDefaultMarker() {
         return DEFAULT_MARKER;
+    }
+
+    static class MapMarkedBlockCache {
+        private static final HashMap<Block, MapMarkedBlock> cache = new HashMap<>();
+
+        public static MapMarkedBlock fromBlock(Block block) {
+            if (cache.containsKey(block))
+                return cache.get(block);
+            else {
+                MapMarkedBlock entry = MAP_MARKED_BLOCKS_REGISTRY.get(Registry.BLOCK.getId(block));
+                cache.put(block, entry);
+                return entry;
+            }
+        }
     }
 }

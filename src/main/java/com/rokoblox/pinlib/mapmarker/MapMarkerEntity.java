@@ -51,10 +51,15 @@ public class MapMarkerEntity {
     @Nullable
     public static MapMarkerEntity fromWorldBlock(World world, BlockPos blockPos) {
         BlockState blockState = world.getBlockState(blockPos);
-        if (blockState.getBlock() instanceof IMapMarkedBlock mapMarkedBlock) {
-            MapMarker type = mapMarkedBlock.getCustomMarker();
-            Text text = mapMarkedBlock.getDisplayName(world, blockPos);
-            return new MapMarkerEntity(type, blockPos, text, mapMarkedBlock.getMarkerColor(world, blockPos));
+        MapMarkedBlock mapMarkedBlock = PinLib.getMapMarkedBlock(blockState.getBlock());
+        if (mapMarkedBlock != null) {
+            MapMarker type = mapMarkedBlock.markerProvider.run();
+            Text text = mapMarkedBlock.markerDisplayNameProvider.run(world, blockPos);
+            return new MapMarkerEntity(type, blockPos, text, mapMarkedBlock.markerColorProvider.run(world, blockPos));
+        } else if (blockState.getBlock() instanceof @SuppressWarnings("deprecation")IMapMarkedBlock deprecatedMapMarkedBlock) {
+            MapMarker type = deprecatedMapMarkedBlock.getCustomMarker();
+            Text text = deprecatedMapMarkedBlock.getDisplayName(world, blockPos);
+            return new MapMarkerEntity(type, blockPos, text, deprecatedMapMarkedBlock.getMarkerColor(world, blockPos));
         }
         return null;
     }
@@ -150,3 +155,4 @@ public class MapMarkerEntity {
         return this.color;
     }
 }
+
