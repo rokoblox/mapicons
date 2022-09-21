@@ -31,5 +31,3 @@ dependencies {
 }
 ```
 See [dependency scope](https://docs.modrinth.com/docs/tutorials/maven/#dependency-scope) to know the difference between `modImplementation`, `modApi` and `include`.
-
-Happy coding!
