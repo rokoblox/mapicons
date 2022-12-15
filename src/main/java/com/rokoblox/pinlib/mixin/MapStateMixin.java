@@ -95,7 +95,7 @@ public class MapStateMixin implements MapStateAccessor {
             if ((mapMarkerTemp = getMapMarker(pos.getX(), pos.getZ())) != null && this.pinlib$customMarkerEntities.remove(mapMarkerTemp.getKey()) != null)
                 removeIcon(mapMarkerTemp.getKey());
 
-            if (!((MapState) (Object) this).method_37343(256)) {
+            if (!((MapState) (Object) this).iconCountNotLessThan(256)) {
                 this.pinlib$customMarkerEntities.put(mapMarker.getKey(), mapMarker);
                 pinlib$customIconMarkerToAdd = mapMarker;
                 addIcon(MapIcon.Type.TARGET_POINT, world, mapMarker.getKey(), d, e, 180.0, mapMarker.getDisplayName());
