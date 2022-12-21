@@ -71,8 +71,9 @@ public class MapStateMixin implements MapStateAccessor {
     @ModifyVariable(method = "addIcon", at = @At("STORE"))
     private MapIcon markIconAsCustomIcon(MapIcon icon) {
         if (pinlib$customIconMarkerToAdd != null) {
-            ((MapIconAccessor)icon).setCustomMarker(pinlib$customIconMarkerToAdd.getType());
-            ((MapIconAccessor)icon).color(pinlib$customIconMarkerToAdd.getColor());
+            ((MapIconAccessor) icon).setCustomMarker(pinlib$customIconMarkerToAdd.getType());
+            ((MapIconAccessor) icon).color(pinlib$customIconMarkerToAdd.getColor());
+            ((MapIconAccessor) icon).textColor(pinlib$customIconMarkerToAdd.getTextColor());
             pinlib$customIconMarkerToAdd.setIcon(icon);
         }
         pinlib$customIconMarkerToAdd = null;

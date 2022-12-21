@@ -83,15 +83,16 @@ public class PinLib implements ModInitializer {
      * @param entry               Block to register
      * @param markerProvider      You can use `() -> PinLib.getDefaultMarker()` as a default value.
      * @param colorProvider       You can use `(world, pos) -> 0xFFFFFFFFL` as a default value.
+     * @param textColorProvider   You can use `(world, pos) -> 0xFFFFFFFFL` as a default value.
      * @param displayNameProvider You can use `(BlockView world, BlockPos pos) -> null` as a default value.
      * @return Provided entry
      */
-    public static MapMarkedBlock registerMapMarkedBlock(Block entry, CustomMarkerProvider markerProvider, MarkerColorProvider colorProvider, MarkerDisplayNameProvider displayNameProvider) {
+    public static MapMarkedBlock registerMapMarkedBlock(Block entry, CustomMarkerProvider markerProvider, MarkerColorProvider colorProvider, MarkerColorProvider textColorProvider, MarkerDisplayNameProvider displayNameProvider) {
         Identifier id = Registries.BLOCK.getId(entry);
         if (id == Registries.BLOCK.getDefaultId())
             LOGGER.warn("Registering default ID [{}] as a map marked block, this might be because the provided block entry was not registered as a block first.", id.toString());
         LOGGER.info("Registering block with id [{}] as a map marked block.", id.toString());
-        return Registry.register(MAP_MARKED_BLOCKS_REGISTRY, id, new MapMarkedBlock(entry, markerProvider, colorProvider, displayNameProvider));
+        return Registry.register(MAP_MARKED_BLOCKS_REGISTRY, id, new MapMarkedBlock(entry, markerProvider, colorProvider, textColorProvider, displayNameProvider));
     }
 
     /**
@@ -129,8 +130,8 @@ public class PinLib implements ModInitializer {
         if (mapMarker == null)
             return null;
         boolean success = ((MapStateAccessor) mapState).addMapMarker(world, pos, mapMarker);
-        if (success)
-            PinLib.LOGGER.info("Added map marker with id [{}] at: [{}]", mapMarker.getId().toString(), pos.toShortString());
+//        if (success)
+//            PinLib.LOGGER.info("Added map marker with id [{}] at: [{}]", mapMarker.getId().toString(), pos.toShortString());
         return success ? mapMarker : null;
     }
 
@@ -166,8 +167,8 @@ public class PinLib implements ModInitializer {
      */
     public static boolean removeMapMarker(MapState mapState, int x, int z, @Nullable MapMarker markerType) {
         MapMarkerEntity removeMapMarker = ((MapStateAccessor) mapState).removeMapMarker(null, x, z, false, markerType);
-        if (removeMapMarker != null)
-            PinLib.LOGGER.info("Removed map marker with id [{}] at: [{}]", removeMapMarker.getId(), removeMapMarker.getPos().toShortString());
+//        if (removeMapMarker != null)
+//            PinLib.LOGGER.info("Removed map marker with id [{}] at: [{}]", removeMapMarker.getId(), removeMapMarker.getPos().toShortString());
         return removeMapMarker != null;
     }
 
@@ -214,18 +215,16 @@ public class PinLib implements ModInitializer {
         MapMarkerEntity mapMarker = MapMarkerEntity.fromWorldBlock(world, blockPos);
         BlockState blockState = world.getBlockState(blockPos);
         if (mapState.addMapMarker(world, blockPos, mapMarker)) {
-            if (mapMarker == null)
-                return false;
-            PinLib.LOGGER.info("Added map marker with id [{}] at: [{}]", mapMarker.getId().toString(), blockPos.toShortString());
-            return true;
-        } else if ((mapMarker = mapState.removeMapMarker(
+            return mapMarker != null;
+//            PinLib.LOGGER.info("Added map marker with id [{}] at: [{}]", mapMarker.getId().toString(), blockPos.toShortString());
+        } else if ((mapState.removeMapMarker(
                 null,
                 blockPos.getX(),
                 blockPos.getZ(),
                 !(blockState.getBlock() instanceof IMapMarkedBlock) && (getMapMarkedBlock(blockState.getBlock()) == null),
                 null
         )) != null) {
-            PinLib.LOGGER.info("Removed map marker with id [{}] at: [{}]", mapMarker.getId(), blockPos.toShortString());
+//            PinLib.LOGGER.info("Removed map marker with id [{}] at: [{}]", mapMarker.getId(), blockPos.toShortString());
             return true;
         }
         return false;

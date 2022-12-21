@@ -31,6 +31,17 @@ public class TestingClass {
                 TESTBLOCK,
                 () -> TESTMARKER,
                 (world, pos) -> 0xFFFFFFFFL,
+                (world, pos) -> {
+                    Identifier id = Registries.BLOCK.getId(world.getBlockState(pos.down()).getBlock());
+                    if (id.getPath() == "red_concrete")
+                        return 0xFFFF0000L;
+                    else if (id.getPath() == "green_concrete")
+                        return 0xFF00FF00;
+                    else if (id.getPath() == "blue_concrete")
+                        return 0xFF0000FF;
+                    else
+                        return 0xFFFFFFFF;
+                },
                 (world, pos) -> Text.literal("Hello world!").setStyle(Style.EMPTY)
         );
         ServerTickEvents.END_SERVER_TICK.register(server -> isRed = !isRed);

@@ -17,12 +17,16 @@ public class MapTextureMixin {
     private @Nullable MapMarker pinlib$custom_marker_cache;
     @Unique
     private long pinlib$cached_color = -1;
+    @Unique
+    private long pinlib$cached_text_color = -1;
 
     @ModifyVariable(method = "draw", at = @At(value = "LOAD", ordinal = 4), ordinal = 0)
     private MapIcon pinlib$CheckForCustomMarker(MapIcon icon) {
         pinlib$custom_marker_cache = ((MapIconAccessor) icon).getCustomMarkerType();
-        if (pinlib$custom_marker_cache != null)
+        if (pinlib$custom_marker_cache != null) {
             pinlib$cached_color = ((MapIconAccessor) icon).getColor();
+            pinlib$cached_text_color = ((MapIconAccessor) icon).getTextColor();
+        }
         return icon;
     }
 
@@ -85,5 +89,18 @@ public class MapTextureMixin {
     @Inject(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V", ordinal = 0))
     private void pinlib$ClearCustomIconColor(CallbackInfo ci) {
         pinlib$cached_color = -1L;
+    }
+
+    @ModifyArg(method = "draw", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)I"
+    ), index = 3)
+    private int pinlib$CustomTextColor(int c) {
+        if (pinlib$cached_text_color != -1L) {
+            int intval = (int) pinlib$cached_text_color;
+            pinlib$cached_text_color = -1L;
+            return intval;
+        }
+        return (int) 0xFFFFFFFFL;
     }
 }

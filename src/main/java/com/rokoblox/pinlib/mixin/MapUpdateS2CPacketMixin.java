@@ -22,6 +22,7 @@ public class MapUpdateS2CPacketMixin {
         if (!id.getPath().equals("null"))
             iconAccessor.setCustomMarker(PinLib.get(id));
         iconAccessor.color(buf3.readLong());
+        iconAccessor.textColor(buf3.readLong());
     }
 
     @Inject(method = "method_34136", at = @At(value = "RETURN"))
@@ -30,5 +31,6 @@ public class MapUpdateS2CPacketMixin {
         MapMarker type = iconAccessor.getCustomMarkerType();
         b.writeIdentifier(type != null ? type.getId() : new Identifier("pinlib", "null"));
         b.writeLong(iconAccessor.getColor());
+        b.writeLong(iconAccessor.getTextColor());
     }
 }

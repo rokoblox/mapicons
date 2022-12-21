@@ -1,7 +1,6 @@
 package com.rokoblox.pinlib.mapmarker;
 
 import com.rokoblox.pinlib.PinLib;
-import com.rokoblox.pinlib.access.MapIconAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.map.MapIcon;
 import net.minecraft.nbt.NbtCompound;
@@ -27,18 +26,20 @@ public class MapMarkerEntity {
     private final BlockPos pos;
     protected @Nullable Text displayName;
     protected long color = 0xFFFFFFFFL;
+    protected long textColor = 0xFFFFFFFF;
     private MapIcon mapIcon;
 
-    private MapMarkerEntity(MapMarker type, Identifier id, BlockPos pos, @Nullable Text displayName, long color) {
+    private MapMarkerEntity(MapMarker type, Identifier id, BlockPos pos, @Nullable Text displayName, long color, long textColor) {
         this.type = type;
         this.id = id;
         this.pos = pos;
         this.displayName = displayName;
         this.color = color;
+        this.textColor = textColor;
     }
 
-    public MapMarkerEntity(MapMarker type, BlockPos pos, @Nullable Text displayName, long color) {
-        this(type, type.getId(), pos, displayName, color);
+    public MapMarkerEntity(MapMarker type, BlockPos pos, @Nullable Text displayName, long color, long textColor) {
+        this(type, type.getId(), pos, displayName, color, textColor);
     }
 
     public MapMarkerEntity(MapMarker type, BlockPos pos, @Nullable Text displayName) {
@@ -55,11 +56,11 @@ public class MapMarkerEntity {
         if (mapMarkedBlock != null) {
             MapMarker type = mapMarkedBlock.markerProvider.run();
             Text text = mapMarkedBlock.markerDisplayNameProvider.run(world, blockPos);
-            return new MapMarkerEntity(type, blockPos, text, mapMarkedBlock.markerColorProvider.run(world, blockPos));
+            return new MapMarkerEntity(type, blockPos, text, mapMarkedBlock.markerColorProvider.run(world, blockPos), mapMarkedBlock.textColorProvider.run(world, blockPos));
         } else if (blockState.getBlock() instanceof @SuppressWarnings("deprecation")IMapMarkedBlock deprecatedMapMarkedBlock) {
             MapMarker type = deprecatedMapMarkedBlock.getCustomMarker();
             Text text = deprecatedMapMarkedBlock.getDisplayName(world, blockPos);
-            return new MapMarkerEntity(type, blockPos, text, deprecatedMapMarkedBlock.getMarkerColor(world, blockPos));
+            return new MapMarkerEntity(type, blockPos, text, deprecatedMapMarkedBlock.getMarkerColor(world, blockPos), 0xFFFFFFFF);
         }
         return null;
     }
@@ -69,18 +70,22 @@ public class MapMarkerEntity {
         MapMarker markerType = PinLib.get(id);
         BlockPos blockPos = NbtHelper.toBlockPos(nbt.getCompound("Pos"));
         long color = nbt.getLong("Color");
+        long textColor = nbt.contains("TextColor") ? nbt.getLong("TextColor") : 0xFFFFFFFF;
         MutableText text = nbt.contains("DisplayName") ? Text.Serializer.fromJson(nbt.getString("DisplayName")) : null;
-        return new MapMarkerEntity(markerType, id, blockPos, text, color);
+        return new MapMarkerEntity(markerType, id, blockPos, text, color, textColor);
     }
 
     public NbtCompound getNbt() {
         NbtCompound nbtCompound = new NbtCompound();
         nbtCompound.putString("Id", this.id.toString());
         nbtCompound.put("Pos", NbtHelper.fromBlockPos(this.pos));
-        if (this.mapIcon != null)
-            nbtCompound.putLong("Color", ((MapIconAccessor) this.mapIcon).getColor());
-        else
+        if (this.mapIcon != null) {
+            nbtCompound.putLong("Color", this.color);
+            nbtCompound.putLong("TextColor", this.textColor);
+        } else {
             nbtCompound.putLong("Color", 0xFFFFFFFFL);
+            nbtCompound.putLong("TextColor", 0xFFFFFFFFL);
+        }
         if (this.displayName != null) {
             nbtCompound.putString("DisplayName", Text.Serializer.toJson(this.displayName));
         }
@@ -132,7 +137,8 @@ public class MapMarkerEntity {
                 && Objects.equals(this.id, mapMarkerEntity.id)
                 && Objects.equals(this.pos, mapMarkerEntity.pos)
                 && Objects.equals(this.displayName, mapMarkerEntity.displayName)
-                && (this.color == mapMarkerEntity.color);
+                && (this.color == mapMarkerEntity.color)
+                && (this.textColor == mapMarkerEntity.textColor);
     }
 
     public int hashCode() {
@@ -153,6 +159,10 @@ public class MapMarkerEntity {
 
     public long getColor() {
         return this.color;
+    }
+
+    public long getTextColor() {
+        return this.textColor;
     }
 }
 

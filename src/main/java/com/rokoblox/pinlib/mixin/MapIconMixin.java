@@ -13,10 +13,13 @@ public class MapIconMixin implements MapIconAccessor {
     @Unique
     private long pinlib$Color = 0xFFFFFFFF;
 
+    @Unique
+    private long pinlib$TextColor = 0xFFFFFFFF;
+
     @Override
     public MapIcon setCustomMarker(MapMarker marker) {
         pinlib$MarkerType = marker;
-        return (MapIcon)(Object)this;
+        return (MapIcon) (Object) this;
     }
 
     @Override
@@ -28,14 +31,27 @@ public class MapIconMixin implements MapIconAccessor {
         return pinlib$Color;
     }
 
-    @Override
+    public long getTextColor() {
+        return pinlib$TextColor;
+    }
+
     public MapIcon color(long color) {
         this.pinlib$Color = color;
-        return (MapIcon)(Object) this;
+        return (MapIcon) (Object) this;
     }
 
     public MapIcon color(int r, int g, int b, int a) {
         this.pinlib$Color = a << 24 | r << 16 | g << 8 | b;
-        return (MapIcon)(Object) this;
+        return (MapIcon) (Object) this;
+    }
+
+    public MapIcon textColor(long color) {
+        this.pinlib$TextColor = color;
+        return (MapIcon) (Object) this;
+    }
+
+    public MapIcon textColor(int r, int g, int b, int a) {
+        this.pinlib$TextColor = a << 24 | r << 16 | g << 8 | b;
+        return (MapIcon) (Object) this;
     }
 }
