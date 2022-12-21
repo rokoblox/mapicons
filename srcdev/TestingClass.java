@@ -6,11 +6,12 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registry;
 import net.minecraft.world.BlockView;
 
 public class TestingClass {
@@ -21,7 +22,7 @@ public class TestingClass {
     public static void init() {
         TESTMARKER = PinLib.createDynamicMarker(new Identifier("pinlib", "testmarker"));
         TESTBLOCK = new TestBlock(FabricBlockSettings.of(Material.STONE));
-        Registry.register(Registry.BLOCK, new Identifier("pinlib", "testblock"), TESTBLOCK);
+        Registry.register(Registries.BLOCK, new Identifier("pinlib", "testblock"), TESTBLOCK);
 
         // Map marked blocks should NOT be registered like this,
         // this is just to demonstrate how to switch from the

@@ -9,10 +9,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.map.MapState;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -86,8 +87,8 @@ public class PinLib implements ModInitializer {
      * @return Provided entry
      */
     public static MapMarkedBlock registerMapMarkedBlock(Block entry, CustomMarkerProvider markerProvider, MarkerColorProvider colorProvider, MarkerDisplayNameProvider displayNameProvider) {
-        Identifier id = Registry.BLOCK.getId(entry);
-        if (id == Registry.BLOCK.getDefaultId())
+        Identifier id = Registries.BLOCK.getId(entry);
+        if (id == Registries.BLOCK.getDefaultId())
             LOGGER.warn("Registering default ID [{}] as a map marked block, this might be because the provided block entry was not registered as a block first.", id.toString());
         LOGGER.info("Registering block with id [{}] as a map marked block.", id.toString());
         return Registry.register(MAP_MARKED_BLOCKS_REGISTRY, id, new MapMarkedBlock(entry, markerProvider, colorProvider, displayNameProvider));
@@ -245,7 +246,7 @@ public class PinLib implements ModInitializer {
             if (cache.containsKey(block))
                 return cache.get(block);
             else {
-                MapMarkedBlock entry = MAP_MARKED_BLOCKS_REGISTRY.get(Registry.BLOCK.getId(block));
+                MapMarkedBlock entry = MAP_MARKED_BLOCKS_REGISTRY.get(Registries.BLOCK.getId(block));
                 cache.put(block, entry);
                 return entry;
             }
